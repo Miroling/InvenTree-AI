@@ -10,6 +10,12 @@ The canonical plan is [Find the path to cloud InvenTree access from ChatGPT and 
 
 Research notes are linked from their research tickets. Decisions are recorded in issue resolution comments, with a short index in the map.
 
+Completed research:
+
+- [ChatGPT and Codex connection requirements](https://github.com/Miroling/InvenTree-AI/blob/a8e093cc508c6871a922df3a7bfda7af46ada9e4/docs/research/client-compatibility.md)
+- [PoC capabilities and cloud migration gaps](https://github.com/Miroling/InvenTree-AI/blob/acd07adfcdda89f18bd40917d417840480bb0b7d/docs/research/poc-assessment.md)
+- [Hosting options and credential boundaries](https://github.com/Miroling/InvenTree-AI/blob/d89363a6c82ef67b3ae145ccbbc7260211fff81d/docs/research/hosting-options.md)
+
 ## Intended connection
 
 ```text
