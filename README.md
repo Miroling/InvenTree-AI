@@ -19,6 +19,7 @@ Completed research:
 - [Hosting options and credential boundaries](https://github.com/Miroling/InvenTree-AI/blob/d89363a6c82ef67b3ae145ccbbc7260211fff81d/docs/research/hosting-options.md)
 - [Authenticated access across ChatGPT, Codex, and Claude](https://github.com/Miroling/InvenTree-AI/blob/60c7a2d309f325c6392718fbcef8e7e3ffc6007e/docs/research/authenticated-clients.md)
 - [Provisional Obscura evaluation](https://github.com/Miroling/InvenTree-AI/blob/f7b27dfbba2d8dc5234b4361409094745404b387/docs/research/obscura-evaluation.md)
+- [Measured Obscura–PinchTab comparison: tokens, site protection, component data and PDF downloads](https://github.com/Miroling/InvenTree-AI/blob/f6009c87dc4cdf0fca2279fc45f7ae1a2b9fc457/docs/research/browser-comparison.md)
 
 ## Intended connection
 
