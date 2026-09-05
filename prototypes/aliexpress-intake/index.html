@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HUSB238_002DD · Intake prototype</title>
+<style>
+:root{font:16px/1.55 system-ui,sans-serif;color:#173339;background:#f3f6f5}body{max-width:1120px;margin:40px auto;padding:0 24px}h1{font-size:32px;line-height:1.2;margin:10px 0}h2{font-size:20px}h3{font-size:16px}p{max-width:90ch}.tag{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:#496764}.panel{background:white;padding:24px;border:1px solid #d9e4df;border-radius:10px;margin:20px 0}.columns{display:grid;grid-template-columns:1fr 1fr;gap:22px}.columns .panel{margin:0}button{font:inherit;cursor:pointer;border:1px solid #92b7aa;border-radius:6px;padding:9px 14px;background:#fff;color:#184e40;margin:4px}button:hover,button[aria-selected=true]{background:#e2efe8}button.primary{background:#185d49;color:white}a{color:#17634c}dl{display:grid;grid-template-columns:145px 1fr;gap:9px;margin:0}dt{color:#59716b}dd{margin:0;overflow-wrap:anywhere}table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:11px 8px;border-bottom:1px solid #e0e7e3;text-align:left;vertical-align:top}.notice{border-left:4px solid #c28b33;padding:14px;background:#fff5de}.muted{color:#5f726d;font-size:14px}#message{min-height:24px;color:#185d49}#steps{padding:12px 0}.verified{color:#18644c}.conflicting{color:#9a421a}.seller_only{color:#657572}@media(max-width:720px){.columns{grid-template-columns:1fr}body{padding:0 14px}table{font-size:12px}dl{grid-template-columns:115px 1fr}}
+</style>
+<body>
+<div class="tag">Throwaway logic prototype · observed public evidence · 5 September 2026</div>
+<h1>From a seller listing to a verified part</h1>
+<p>Can we prepare a useful Change Plan for <strong>HUSB238_002DD</strong> while preserving a package disagreement and incomplete seller evidence? Explore the observed case below. The manufacturer is the technical source of truth.</p>
+<p class="notice">This page replays a recorded Obscura extraction. It makes no network calls, uses synthetic inventory, and cannot write to InvenTree. Review buttons only change this demonstration's in-memory state.</p>
+<div class="columns"><section class="panel"><h2>Current state</h2><dl id="state"></dl></section><section class="panel"><h2>Evidence boundaries</h2><p>The seller's accessible title says <strong>“(10piece)100% New HUSB238 HUSB238_002DD QFN-10”</strong>.</p><p>Hynetek identifies the exact model as <strong>DFN-10L</strong>. Its full datasheet is Rev. 2.5, 17 pages; the ordering guide is on page 15.</p><p class="muted">Only listing metadata was usable. The full seller description, variant table and image claims were not verified. “All seller specifications verified” would be false.</p><div id="sources"></div></section></div>
+<section class="panel"><h2>Try the workflow</h2><div id="actions"></div><p id="message" role="status" aria-live="polite"></p></section>
+<section class="panel"><h2>Recorded seller claims · HUSB238_002DD</h2><table><thead><tr><th>Claim</th><th>Seller</th><th>Manufacturer evidence</th><th>Result</th></tr></thead><tbody id="claims"></tbody></table></section>
+<section class="panel"><h2>Change Plan preview</h2><div id="plan"></div></section>
+<section class="panel"><h2>Guided walkthroughs</h2><div id="tabs" role="tablist" aria-label="Workflow examples"></div><p id="scenario"></p><div id="steps"></div></section>
+<p class="muted">Source PDFs and raw pages are retained outside this shareable file. No price, seller stock or authenticity is inferred from the datasheet. Reopening the file resets the demonstration.</p>
+<script>
+// Portable state logic. No DOM, network, storage, or inventory side effects.
+const observed={mpn:'HUSB238_002DD',manufacturer:'Hynetek Semiconductor',package:'DFN-10L',seller:'https://www.aliexpress.com/item/1005009814305006.html',vendor:'https://www.hynetek.com/2421.html',pdf:'https://www.hynetek.com/uploadfiles/site/219/news/c16af076-8c40-4e8d-b126-b4f9b83e86ea.pdf',pdfHash:'d4dabfe5e6055ec72f14dd2f4ae8f913be80822c14d2d24f910ea4bb777c002a'};
+const ledger=[
+ ['Part family','HUSB238','Official HUSB238 product page and datasheet p. 1','verified'],
+ ['Exact model','HUSB238_002DD','Official ordering guide, datasheet p. 15','verified'],
+ ['Package designation','QFN-10','DFN-10L, exact-model ordering guide p. 15','conflicting'],
+ ['Offered pack size','10 pieces','Commercial seller claim; not an inventory receipt','seller_only'],
+ ['Condition / authenticity','100% New','A datasheet cannot authenticate delivered goods','seller_only']
+];
+function initial(){return {loaded:false,variant:observed.mpn,matched:false,resolved:false,existing:false,plan:null,reviewed:false,message:'Start by loading the recorded evidence.'};}
+function reduce(current,action){
+ const s={...current};
+ if(action==='reset')return initial();
+ if(action==='load'){s.loaded=true;s.matched=s.variant===observed.mpn;s.resolved=false;s.plan=null;s.reviewed=false;s.message='Manufacturer evidence loaded. The seller package designation conflicts.';}
+ if(action==='resolve'){if(!s.loaded||!s.matched){s.message='First establish manufacturer evidence for the selected model.';return s;}s.resolved=true;s.plan=null;s.reviewed=false;s.message='Use manufacturer DFN-10L in the draft. The seller conflict remains in the claim ledger.';}
+ if(action==='draft'){
+  if(!s.loaded||!s.matched||!s.resolved){s.message='Draft blocked: load exact-model manufacturer evidence and resolve the package value first.';return s;}
+  s.plan={operation:s.existing?'Propose update to synthetic matching Part':'Propose new Part in synthetic inventory',mpn:s.variant,manufacturer:observed.manufacturer,package:observed.package,datasheet:observed.pdf,stockQuantity:null,coverage:'Seller metadata only; remaining seller sections uninspected',conflict:'Seller QFN-10; manufacturer DFN-10L',authority:'Manufacturer ordering guide, Rev. 2.5, page 15'};s.reviewed=false;s.message='Draft prepared using manufacturer-backed technical fields. No inventory action was executed.';
+ }
+ if(action==='review'){if(!s.plan){s.message='There is no current draft to review.';return s;}s.reviewed=true;s.message='Demo review recorded in memory. This is not authorization for a real inventory write.';}
+ if(action==='variant'){s.variant=s.variant===observed.mpn?'HUSB238_003DD':observed.mpn;s.matched=false;s.resolved=false;s.plan=null;s.reviewed=false;s.message='Simulated variant change. Previous evidence matching, draft and review are invalidated; load the correct model evidence.';}
+ if(action==='existing'){s.existing=!s.existing;s.plan=null;s.reviewed=false;s.message='Synthetic inventory changed. Regenerate and review the plan.';}
+ return s;
+}
+const labels={load:'Load recorded evidence',resolve:'Use manufacturer package',draft:'Prepare draft',review:'Review draft (demo)',variant:'Simulate variant change',existing:'Toggle synthetic existing Part',reset:'Reset'};
+const scenarios=[
+ {title:'Actual listing',description:'Load the real observed source facts, keep the package discrepancy visible, and review a manufacturer-backed draft.',steps:['load','resolve','draft','review']},
+ {title:'Unresolved conflict',description:'Try drafting before resolving the seller/manufacturer package mismatch. It must stay blocked until the proposed value follows manufacturer evidence.',steps:['load','draft','resolve','draft']},
+ {title:'Changed variant',description:'A review for one ordering code must not carry over to a different code. Changing the variant clears the old plan and review.',steps:['load','resolve','draft','review','variant','review']}
+];
+let state=initial(),scenarioIndex=0,stepIndex=0;
+const byId=id=>document.getElementById(id);
+function add(parent,tag,text,cls){const node=document.createElement(tag);node.textContent=text;if(cls)node.className=cls;parent.appendChild(node);return node;}
+function fields(parent,rows){for(const [key,value] of rows){add(parent,'dt',key);add(parent,'dd',value);}}
+function act(action){state=reduce(state,action);render();}
+function render(){
+ const panel=byId('state');panel.replaceChildren();fields(panel,[['Selected variant',state.variant],['Evidence origin',state.loaded?'Recorded official manufacturer sources':'Not loaded'],['Exact model',state.matched?'Matched to manufacturer ordering guide':'Not matched'],['Package decision',state.resolved?'Manufacturer DFN-10L selected':'Unresolved'],['Seller coverage','Partial: metadata only'],['Inventory',state.existing?'Synthetic existing Part':'Synthetic empty inventory'],['Draft',state.plan?'Prepared':'None'],['Review',state.reviewed?'Demo acknowledgement only':'Not reviewed'],['Writes performed','None']]);
+ byId('message').textContent=state.message;
+ const p=byId('plan');p.replaceChildren();if(!state.plan){add(p,'p','No current draft. Resolve the exact part and manufacturer package before preparing one.');}else{const dl=add(p,'dl','');fields(dl,[['Proposed operation',state.plan.operation],['Manufacturer part',state.plan.mpn],['Manufacturer',state.plan.manufacturer],['Package',state.plan.package],['Evidence',state.plan.authority],['Stock quantity','Not proposed — offered pack size does not prove a receipt'],['Seller conflict',state.plan.conflict],['Coverage',state.plan.coverage],['Review',state.reviewed?'Reviewed in this demo; no real authorization':'Awaiting review']]);const a=add(p,'a','Original manufacturer datasheet');a.href=state.plan.datasheet;a.target='_blank';a.rel='noopener noreferrer';}
+ const table=byId('claims');table.replaceChildren();for(const row of ledger){const tr=add(table,'tr','');row.forEach((x,i)=>add(tr,'td',i===3?x.replace('_',' '):x,i===3?x:''));}
+ const tabs=byId('tabs');tabs.replaceChildren();scenarios.forEach((x,i)=>{const b=add(tabs,'button',x.title);b.setAttribute('role','tab');b.setAttribute('aria-selected',String(i===scenarioIndex));b.onclick=()=>{scenarioIndex=i;stepIndex=0;state=initial();render();};});
+ const current=scenarios[scenarioIndex];byId('scenario').textContent=current.description;const steps=byId('steps');steps.replaceChildren();add(steps,'p',current.steps.map((x,i)=>(i<stepIndex?'✓ ':'')+labels[x]).join(' → '),'muted');if(stepIndex<current.steps.length){const b=add(steps,'button','Next: '+labels[current.steps[stepIndex]],'primary');b.onclick=()=>{const action=current.steps[stepIndex++];act(action);};}else{add(steps,'p','Walkthrough complete. Select a scenario to restart or use the free-play buttons.');}
+}
+for(const [key,label] of Object.entries(labels)){const b=add(byId('actions'),'button',label);b.onclick=()=>act(key);}
+for(const [name,url] of [['Seller listing',observed.seller],['Official manufacturer',observed.vendor],['Full datasheet · 17 pages',observed.pdf]]){const a=add(byId('sources'),'a',name);a.href=url;a.target='_blank';a.rel='noopener noreferrer';add(byId('sources'),'br','');}
+render();
+</script></body></html>
