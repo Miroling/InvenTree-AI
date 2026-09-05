@@ -5,7 +5,10 @@ This context describes inventory records and the review process for changes prop
 ## Language
 
 **Allowed user**:
-A person explicitly approved by the inventory owner to access the integration after signing in. Signing in alone does not make someone an allowed user.
+A person whose personal credential is accepted by the configured InvenTree instance. Their inventory actions remain limited by their InvenTree permissions; there is no separate manually maintained admission list.
+
+**Linked credential**:
+A user's InvenTree API token entrusted to the integration for requests to that user's inventory instance. It is distinct from the credential used to connect an AI client to the integration.
 
 **Part**:
 A catalog definition of an item that may be held in inventory.

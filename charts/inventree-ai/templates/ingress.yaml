@@ -34,4 +34,18 @@ spec:
                 name: {{ include "inventree-ai.name" . }}
                 port:
                   name: http
+          - path: /.well-known/oauth-authorization-server
+            pathType: Exact
+            backend:
+              service:
+                name: {{ include "inventree-ai.name" . }}
+                port:
+                  name: http
+          - path: /auth
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "inventree-ai.name" . }}
+                port:
+                  name: http
 {{- end }}

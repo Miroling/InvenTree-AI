@@ -2,7 +2,7 @@ apiVersion: v2
 name: inventree-ai
 description: Deployment scaffold for an authenticated InvenTree MCP service on k3s
 type: application
-version: 0.1.0
+version: 0.2.0
 kubeVersion: ">=1.26.0-0"
 home: https://github.com/Miroling/InvenTree-AI
 sources:

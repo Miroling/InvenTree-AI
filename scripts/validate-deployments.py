@@ -25,7 +25,7 @@ class DeploymentTemplates(unittest.TestCase):
             "image": {"reference": "example.invalid/inventree-ai:validation-only"},
             "publicUrl": "https://mcp.example.invalid/mcp",
             "inventreeUrl": "https://inventory.example.invalid",
-            "auth": {"issuerUrl": "https://identity.example.invalid", "audience": "inventory-mcp"},
+            "auth": {"audience": "inventory-mcp"},
             "existingSecret": "synthetic-existing-secret",
         }
         cls.values_file = cls.path / "values.json"
@@ -38,20 +38,16 @@ class DeploymentTemplates(unittest.TestCase):
             "HELM_CACHE_HOME": str(cls.path / "helm-cache"),
             "HELM_DATA_HOME": str(cls.path / "helm-data"),
         }
-        cls.token_file = cls.path / "token"
-        cls.policy_file = cls.path / "policy.json"
-        cls.token_file.write_text("SYNTHETIC_SECRET_NOT_FOR_USE")
-        cls.policy_file.write_text('{"validation_fixture_only":true}')
+        cls.broker_file = cls.path / "auth-broker.json"
+        cls.broker_file.write_text('{"validation_fixture_only":"SYNTHETIC_SECRET_NOT_FOR_USE"}')
         cls.compose_env = {
             **cls.base_env,
             "MCP_IMAGE": "example.invalid/inventree-ai:validation-only",
             "CADDY_IMAGE": "example.invalid/caddy:validation-only",
             "MCP_DOMAIN": "mcp.example.invalid",
-            "MCP_AUTH_ISSUER_URL": "https://identity.example.invalid",
             "MCP_AUTH_AUDIENCE": "inventory-mcp",
             "INVENTREE_URL": "https://inventory.example.invalid",
-            "INVENTREE_TOKEN_FILE": str(cls.token_file),
-            "MCP_AUTH_POLICY_FILE": str(cls.policy_file),
+            "MCP_AUTH_BROKER_CONFIG_FILE": str(cls.broker_file),
         }
 
     def command(self, args, *, env=None, success=True):
@@ -86,9 +82,15 @@ class DeploymentTemplates(unittest.TestCase):
         container = pod["containers"][0]
         env = {item["name"]: item["value"] for item in container["env"]}
         self.assertEqual(env["MCP_AUTH_REQUIRED"], "true")
+        self.assertEqual(env["MCP_AUTH_MODE"], "inventree-token")
+        self.assertEqual(env["MCP_AUTH_ISSUER_URL"], "https://mcp.example.invalid")
         self.assertNotIn("INVENTREE_TOKEN", env)
+        self.assertNotIn("INVENTREE_TOKEN_FILE", env)
+        self.assertNotIn("MCP_AUTH_POLICY_FILE", env)
         self.assertTrue(container["securityContext"]["readOnlyRootFilesystem"])
         self.assertEqual(pod["volumes"][0]["secret"]["secretName"], "synthetic-existing-secret")
+        self.assertEqual(pod["volumes"][0]["secret"]["items"],
+                         [{"key": "auth-broker.json", "path": "auth-broker.json"}])
         source = objects["NetworkPolicy"]["spec"]["ingress"][0]["from"]
         self.assertEqual(len(source), 1)
         self.assertIn("podSelector", source[0])
@@ -100,10 +102,11 @@ class DeploymentTemplates(unittest.TestCase):
         ingress = objects["Ingress"]["spec"]
         self.assertEqual(ingress["tls"][0]["secretName"], "synthetic-tls")
         paths = [x["path"] for x in ingress["rules"][0]["http"]["paths"]]
-        self.assertEqual(paths, ["/mcp", "/.well-known/oauth-protected-resource"])
+        self.assertEqual(paths, ["/mcp", "/.well-known/oauth-protected-resource",
+                                 "/.well-known/oauth-authorization-server", "/auth"])
 
     def test_invalid_or_missing_auth_configuration_is_rejected(self):
-        for override in ["auth.issuerUrl=", "auth.audience=", "auth.issuerUrl=http://identity.example.invalid",
+        for override in ["auth.audience=", "auth.issuerUrl=https://unconfigured.example.invalid",
                          "existingSecret=", "image.reference=", "publicUrl=http://mcp.example.invalid/mcp",
                          "auth.required=false"]:
             with self.subTest(override=override):
@@ -126,14 +129,19 @@ class DeploymentTemplates(unittest.TestCase):
         mcp = config["services"]["mcp"]
         self.assertFalse(mcp.get("ports"))
         self.assertEqual(mcp["environment"]["MCP_AUTH_REQUIRED"], "true")
+        self.assertEqual(mcp["environment"]["MCP_AUTH_MODE"], "inventree-token")
+        self.assertEqual(mcp["environment"]["MCP_AUTH_ISSUER_URL"], "https://mcp.example.invalid")
+        self.assertNotIn("INVENTREE_TOKEN_FILE", mcp["environment"])
+        self.assertNotIn("MCP_AUTH_POLICY_FILE", mcp["environment"])
+        self.assertEqual(set(config["secrets"]), {"auth_broker"})
         self.assertNotIn("SYNTHETIC_SECRET_NOT_FOR_USE", result.stdout)
         gateway = config["services"]["gateway"]
         self.assertEqual({p["host_ip"] for p in gateway["ports"]}, {"127.0.0.1"})
         self.assertEqual(gateway["depends_on"]["mcp"]["condition"], "service_healthy")
 
     def test_compose_requires_image_auth_and_secret_inputs(self):
-        for key in ["MCP_IMAGE", "CADDY_IMAGE", "MCP_AUTH_ISSUER_URL", "MCP_AUTH_AUDIENCE",
-                    "INVENTREE_TOKEN_FILE", "MCP_AUTH_POLICY_FILE"]:
+        for key in ["MCP_IMAGE", "CADDY_IMAGE", "MCP_DOMAIN", "MCP_AUTH_AUDIENCE",
+                    "INVENTREE_URL", "MCP_AUTH_BROKER_CONFIG_FILE"]:
             with self.subTest(key=key):
                 self.compose({k: v for k, v in self.compose_env.items() if k != key}, success=False)
 

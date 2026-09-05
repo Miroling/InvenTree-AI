@@ -2,13 +2,13 @@
 
 ## Project stage
 
-This project is in wayfinder planning with explicitly requested deployment scaffolding. The canonical artifact is [Find the path to cloud InvenTree access from ChatGPT, Codex, and Claude](https://github.com/Miroling/InvenTree-AI/issues/1). The owner has authorized Docker Compose and a Helm chart for k3s now; do not reinterpret planning as a reason to leave those artifacts unwritten. The runtime, identity provider and workflow scope still require decisions.
+This project is in wayfinder planning with explicitly requested deployment scaffolding. The canonical artifact is [Find the path to cloud InvenTree access from ChatGPT, Codex, and Claude](https://github.com/Miroling/InvenTree-AI/issues/1). The owner has authorized Docker Compose and a Helm chart for k3s now; do not reinterpret planning as a reason to leave those artifacts unwritten. Runtime implementation, the OAuth broker library/storage, and workflow scope still require decisions.
 
 Ask the owner questions in Ukrainian. Write all repository documentation, issue bodies, research, and code comments in English.
 
 Required deployment targets are Docker Compose and Helm on k3s. Public inventory access must require authenticated and authorized users from ChatGPT, Codex, and Claude. Login to an AI client is not authorization to this service. Obscura is a candidate for component research, not an approved replacement for PinchTab.
 
-The owner selected access for explicitly allowed users only. Deny users who are not on the owner-controlled allowed-user list even if authentication succeeds. The identity provider and its hosting location remain open choices; do not re-open the admission-model choice without new owner instructions.
+The owner clarified that InvenTree determines admission: validate each user's personal InvenTree API token against the configured instance, then admit that identity to this project's MCP services. This supersedes the separate manual allowlist interpretation. Preserve that user's upstream permissions and never fall back to a shared administrative token. Use a distinct OAuth credential for AI-to-MCP access; only the separately linked InvenTree token is sent to InvenTree. A valid token grants service admission, not permission to every inventory operation. Do not require Authentik, Keycloak, or Auth0 merely to maintain another user directory; the OAuth broker mechanism still needs implementation.
 
 Consult wayfinder, grilling, and domain-modeling for decision sessions. Consult research for evidence gathering, official OpenAI documentation for client requirements, and plugin-creator when implementing Codex packaging. Recommendations in research are not owner-approved decisions.
 

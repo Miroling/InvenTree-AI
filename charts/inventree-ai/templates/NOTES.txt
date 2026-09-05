@@ -4,6 +4,7 @@ This repository does not yet publish an MCP runtime image. Rendering is not
 evidence that the supplied image implements authentication or InvenTree tools.
 See docs/deployment/runtime-contract.md and docs/deployment/README.md.
 
-Public access requires a tested authenticated runtime, authorized users,
-an OAuth provider, and valid TLS. Discovery metadata is public; MCP calls are not.
+Public access requires a tested OAuth broker, per-user InvenTree token validation,
+durable encrypted credential storage, and valid TLS. Discovery and login routes
+are public; MCP calls require authorization. No shared InvenTree token is mounted.
 Secret rotation requires a rollout until runtime reload behavior is implemented.

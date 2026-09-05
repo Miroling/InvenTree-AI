@@ -9,10 +9,10 @@ replicaCount: 1
 publicUrl: ""
 inventreeUrl: ""
 auth:
-  issuerUrl: ""
   audience: ""
 
-# Pre-existing Secret; keys: inventree-token and authorization-policy.json.
+# Pre-existing Secret; key: auth-broker.json (signing/storage configuration).
+# Personal InvenTree tokens are linked by users at runtime, not deployed globally.
 # No secret contents belong in Helm values or rendered release history.
 existingSecret: ""
 

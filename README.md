@@ -24,13 +24,16 @@ Completed research:
 
 ```text
 ChatGPT in a browser ─┐
-Codex ────────────────┼── HTTPS + OAuth ── MCP service ── InvenTree API
-Claude ───────────────┘
+Codex ────────────────┼── MCP OAuth token ── MCP service ── user's InvenTree token ── InvenTree
+Claude ───────────────┘                          │
+                                  InvenTree-backed browser login
 ```
 
 GitHub distributes the source, documentation, and eventual Codex package. The MCP service needs a separate runtime that can reach the selected InvenTree instance.
 
-Docker Compose and Helm for k3s are required deployment targets. Access is restricted to explicitly allowed users. The identity provider, first release's workflows, and runtime implementation are still being decided in the map. Current research starts from an existing local InvenTree proof of concept, including its intake workflows, API compatibility fixes, and review-before-write behavior. Obscura is being evaluated for component enrichment; it is not selected or bundled.
+Docker Compose and Helm for k3s are required deployment targets. InvenTree determines access by validating each user's personal API token; a separate manual allowlist is not required. All inventory requests retain that user's upstream permissions. ChatGPT, Codex, and Claude use separate MCP OAuth credentials, not the raw InvenTree token. See [the authentication design](docs/deployment/authentication.md).
+
+The OAuth broker, credential storage, first release's workflows, and runtime implementation are still being decided in the map. Current research starts from an existing local InvenTree proof of concept, including its intake workflows, API compatibility fixes, and review-before-write behavior. Obscura is being evaluated for component enrichment; it is not selected or bundled.
 
 ## Contributing to the decisions
 

@@ -1,26 +1,26 @@
 # Docker Compose and k3s deployment
 
-**Status: deployment scaffolding.** Compose and Helm files are available and can be validated locally. The MCP application, its image, OAuth provider integration, authorization policy, and client login tests are not implemented yet. Do not treat a successful render as a working or authenticated release.
+**Status: deployment scaffolding.** Compose and Helm files are available and can be validated locally. The MCP application, its image, InvenTree-backed OAuth broker, encrypted credential storage, and client login tests are not implemented yet. Do not treat a successful render as a working or authenticated release.
 
 The runtime must first implement [the proposed image contract](runtime-contract.md). This repository does not currently publish an image to pull. Deployment commands below document the eventual operator workflow; configuration checks are usable now with the synthetic validation script.
 
 ## Architecture
 
 ```text
-ChatGPT / Codex / Claude ── HTTPS + service OAuth token ── MCP service ── InvenTree
-             │                                              │
-             └── Browser login at chosen OAuth provider ─────┘
+ChatGPT / Codex / Claude ── service OAuth token ── MCP service ── user token ── InvenTree
+             │                                      │
+             └── Browser login with InvenTree token ─┘
 
 Compose: Caddy → private container listener
 k3s:     existing Traefik HTTPS ingress → ClusterIP Service → MCP Pod
 ```
 
-Only the front door is public. OAuth discovery is public and inventory MCP calls are protected by the runtime. The upstream InvenTree token stays in a mounted secret. The deployment does not assume that an AI account grants access, and does not install a browser worker or expose a browser control port.
+Only the front door is public. OAuth discovery and login routes are public; MCP calls require runtime authorization. The user links a personal InvenTree token on the HTTPS login page. Tokens are stored encrypted and resolved per caller; no shared administrator token is deployed. InvenTree determines admission and operation permissions. See [the authentication design](authentication.md). No browser worker or public browser control port is included.
 
 ## Docker Compose
 
-1. Copy `deploy/compose/.env.example` to an operator-owned file outside source control and fill in the verified MCP image, pinned official Caddy image, MCP domain, OAuth issuer/audience, upstream URL, and local secret-file paths. Use absolute secret-file paths. The policy must admit only explicitly allowed users; its format depends on the future provider integration.
-2. Make mounted secret files readable by the container's UID/GID `10001` without broadening access to unrelated users. Compose file-backed secrets use bind mounts; do not assume a `uid` or `mode` declaration will fix host permissions. Keep the InvenTree token out of environment worksheets and command arguments. [Compose secret behavior](https://docs.docker.com/reference/compose-file/services/#secrets).
+1. Copy `deploy/compose/.env.example` to an operator-owned file outside source control and fill in the verified MCP image, pinned official Caddy image, MCP domain, OAuth audience, upstream URL, and broker-configuration file path. Use an absolute secret-file path. The issuer is derived from the MCP HTTPS origin. Broker configuration must specify signing and encrypted durable-store access once the implementation is selected; it contains no deployment-wide InvenTree token.
+2. Make the mounted broker-configuration file readable by the container's UID/GID `10001` without broadening access to unrelated users. Compose file-backed secrets use bind mounts; do not assume a `uid` or `mode` declaration will fix host permissions. Keep secret contents out of environment worksheets and command arguments. [Compose secret behavior](https://docs.docker.com/reference/compose-file/services/#secrets).
 3. Validate without contacting Docker Engine:
 
    ```sh
@@ -34,14 +34,14 @@ Only the front door is public. OAuth discovery is public and inventory MCP calls
    docker compose --env-file /absolute/path/to/inventree-ai.env -f compose.yaml up -d
    ```
 
-The MCP container publishes no host port. Caddy waits for the image's health check and forwards `/mcp` and resource-discovery paths. It does not implement OAuth itself. Certificate data is kept in named volumes. Inventory/approval state has no persistent storage in this scaffold; its runtime requirements must be completed first.
+The MCP container publishes no host port. Caddy waits for the image's health check and forwards `/mcp`, `/auth` and OAuth discovery. It does not implement OAuth itself. Certificate data is kept in named volumes. Credential/grant/approval state has no persistent storage in this scaffold; its runtime requirements must be completed first.
 
 ## Helm on k3s
 
-The chart uses standard Deployment, Service, Ingress, and NetworkPolicy resources. It assumes an existing ingress controller and TLS Secret. It does not install or reconfigure the cluster's Traefik, certificate manager, identity provider, or InvenTree. k3s normally includes Traefik, but actual versions, labels and enabled components must be checked for the target cluster. [k3s networking](https://docs.k3s.io/networking/networking-services).
+The chart uses standard Deployment, Service, Ingress, and NetworkPolicy resources. It assumes an existing ingress controller and TLS Secret. It does not install or reconfigure the cluster's Traefik, certificate manager, or InvenTree. k3s normally includes Traefik, but actual versions, labels and enabled components must be checked for the target cluster. [k3s networking](https://docs.k3s.io/networking/networking-services).
 
-1. Prepare a namespace, a TLS certificate Secret, and an application Secret through the operator's normal secret-management process. The application Secret must have `inventree-token` and `authorization-policy.json` keys. Reference its name in Helm values; never place these values themselves in a chart, Git commit, or `--set` argument. Kubernetes Secrets require appropriate cluster RBAC, storage encryption and backup policy; a Secret reference alone does not establish those controls.
-2. Copy `deploy/k3s/values.example.yaml` to an operator-owned values file. Set the verified image, canonical resource URL, upstream URL, issuer/audience, and existing Secret names. Set the ingress host to match the public URL exactly. Adjust the ingress-controller namespace/pod selectors if needed.
+1. Prepare a namespace, a TLS certificate Secret, and an application Secret through the operator's normal secret-management process. The application Secret must have an `auth-broker.json` key for the future signing/storage configuration. Personal InvenTree credentials are linked at runtime. Reference its name in Helm values; never place these values themselves in a chart, Git commit, or `--set` argument. Kubernetes Secrets require appropriate cluster RBAC, storage encryption and backup policy; a Secret reference alone does not establish those controls.
+2. Copy `deploy/k3s/values.example.yaml` to an operator-owned values file. Set the verified image, canonical resource URL, upstream URL, audience, and existing Secret names. Set the ingress host to match the public URL exactly; its HTTPS origin is the broker issuer. Adjust the ingress-controller namespace/pod selectors if needed.
 3. Validate locally, without a kubeconfig or cluster connection:
 
    ```sh

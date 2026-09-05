@@ -17,9 +17,8 @@
     "auth": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["issuerUrl", "audience"],
+      "required": ["audience"],
       "properties": {
-        "issuerUrl": {"type": "string", "pattern": "^https://[^/?#]+(/[^?#]*)?$"},
         "audience": {"type": "string", "minLength": 1}
       }
     },

@@ -1,5 +1,5 @@
 {$MCP_DOMAIN} {
-    @mcp path /mcp /mcp/* /.well-known/oauth-protected-resource /.well-known/oauth-protected-resource/*
+    @mcp path /mcp /mcp/* /auth /auth/* /.well-known/oauth-protected-resource /.well-known/oauth-protected-resource/* /.well-known/oauth-authorization-server
     handle @mcp {
         reverse_proxy mcp:8000 {
             flush_interval -1

@@ -5,7 +5,6 @@ image:
 publicUrl: ""
 inventreeUrl: ""
 auth:
-  issuerUrl: ""
   audience: ""
 existingSecret: ""
 ingress:

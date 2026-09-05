@@ -21,16 +21,14 @@ services:
       MCP_PORT: "8000"
       MCP_PUBLIC_URL: https://${MCP_DOMAIN:?Set the public MCP domain}/mcp
       MCP_AUTH_REQUIRED: "true"
-      MCP_AUTH_ISSUER_URL: ${MCP_AUTH_ISSUER_URL:?Set the HTTPS OAuth issuer URL}
+      MCP_AUTH_MODE: inventree-token
+      MCP_AUTH_ISSUER_URL: https://${MCP_DOMAIN:?Set the public MCP domain}
       MCP_AUTH_AUDIENCE: ${MCP_AUTH_AUDIENCE:?Set the audience issued for this MCP service}
-      MCP_AUTH_POLICY_FILE: /run/secrets/authorization-policy.json
+      MCP_AUTH_BROKER_CONFIG_FILE: /run/secrets/auth-broker.json
       INVENTREE_URL: ${INVENTREE_URL:?Set the InvenTree API base URL}
-      INVENTREE_TOKEN_FILE: /run/secrets/inventree-token
     secrets:
-      - source: inventree_token
-        target: inventree-token
-      - source: authorization_policy
-        target: authorization-policy.json
+      - source: auth_broker
+        target: auth-broker.json
     expose: ["8000"]
     networks: [backend]
     # The image must provide this executable; no curl/python assumption is made.
@@ -73,7 +71,5 @@ volumes:
   caddy_config: {}
 
 secrets:
-  inventree_token:
-    file: ${INVENTREE_TOKEN_FILE:?Set the local secret file path}
-  authorization_policy:
-    file: ${MCP_AUTH_POLICY_FILE:?Set the local authorization policy file path}
+  auth_broker:
+    file: ${MCP_AUTH_BROKER_CONFIG_FILE:?Set the local OAuth broker configuration file path}
