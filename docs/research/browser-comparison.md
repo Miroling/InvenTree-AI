@@ -127,3 +127,41 @@ The PinchTab result is specific to the tested release/browser/download route; it
 5. Before promising cloud reliability, repeat on the intended deployment egress with task-specific authorization and a larger representative component set. Test exact-part matching, images, search ranking, challenge handling and total agent-loop cost there. This research does not authorize server access or select a production provider.
 
 Raw pages, browser profiles, local control credentials and copyrighted source PDFs are not published with this note. The methods, public URLs, versions, measurements and artifact hashes above are the public reproduction record.
+
+## Follow-up: persistent Obscura sessions on DigiKey and Mouser
+
+Date: 2026-09-05. The owner requested a repeat of the two blocked distributor pages with persistent sessions and a stable browser profile. This follow-up changes the earlier observation from “DigiKey always challenged in that pilot” to **intermittent access under the follow-up conditions**, not a proven solution.
+
+### Method
+
+Used the same Obscura 0.2.2 rendering-and-stealth binary and exact DigiKey/Mouser URLs listed above, on the local outbound connection. Each domain had its own initially empty temporary storage directory, reused across three sequential visits. `OBSCURA_PROFILE=0` was set, `OBSCURA_ROTATE_PROFILE` was absent, and no User-Agent override, proxy or supplied site credentials were used. Profile 0 is already the release's default, so explicitly pinning it is not itself evidence of an improvement. The observed profile was Windows/Chrome 145, with the default Europe/Berlin timezone; no exit-IP geolocation was measured or asserted.
+
+The effective command shape was:
+
+```sh
+env -u OBSCURA_ROTATE_PROFILE OBSCURA_PROFILE=0 \
+  obscura fetch "$COMPONENT_URL" \
+  --stealth --storage-dir "$COMPONENT_SESSION_DIR" \
+  --dump text --wait 5 --timeout 30 --quiet
+```
+
+Each process had an outer 50-second deadline. The two sites were visited serially, with a 15-second pause between rounds. No interactive challenge-solving service was used. File existence and cookie counts were inspected locally; cookie values and raw profiles are not published.
+
+A two-visit preflight revealed a CLI argument-placement trap: placing `--storage-dir` before `fetch` did not create persisted cookie files in this release. Those two visits were excluded from the three-round table. Moving the parameter into the `fetch` subcommand produced `cookies.json`; subsequent visits started with that file present. **`--eval` is not the persistence problem:** its normal return path also saves cookies. [Tagged CLI source](https://github.com/h4ckf0r0day/obscura/blob/v0.2.2/crates/obscura-cli/src/main.rs), [documented storage command](https://github.com/h4ckf0r0day/obscura/blob/v0.2.2/docs/Persist-cookies-and-storage.md), [stable profile selection](https://github.com/h4ckf0r0day/obscura/blob/v0.2.2/crates/obscura-browser/src/profiles.rs).
+
+### Observations
+
+| Site | Visit 1: empty stored state | Visit 2: reused state | Visit 3: reused state | Final persisted cookie count |
+|---|---|---|---|---:|
+| DigiKey | Cloudflare challenge, 5.20 s | Product attributes retrieved, 12.61 s | Cloudflare challenge, 5.39 s | 31 |
+| Mouser | Access denied, 5.79 s | Access denied, 5.86 s | Access denied, 5.79 s | 8 |
+
+The successful DigiKey response contained labeled NE555P, Texas Instruments, supplier package 8-PDIP, supply voltage 4.5–16 V, supply current 10 mA and operating temperature 0–70 °C. This was useful product content, not an MPN appearing only in a URL or navigation menu. Field presence was reviewed; no new independent electrical validation or PDF download was performed.
+
+DigiKey's cookie file grew from 388 bytes after visit 1 to 11,174 bytes after visit 2, and remained 11,174 bytes after the failed third visit. Mouser's cookie file existed throughout the warm visits. Cookie persistence therefore worked, but persisted state did not guarantee continuing access. The inspection verifies saved state and the configured load path, not that a particular cookie was accepted by the site.
+
+**Result:** DigiKey had one useful response in three recorded visits; Mouser had none. Do not treat these small correlated samples as general success probabilities or claim saved cookies caused the successful response: there was no randomized concurrent fresh-session control, and earlier/preflight requests, timing and site behavior are confounders. The follow-up also used native text extraction rather than the earlier pilot's evaluated DOM output.
+
+### Project implication
+
+Keep persistent, isolated sessions as a supported configuration, but retain challenge detection, bounded attempts and an alternate retrieval path. This follow-up does not justify replacing PinchTab for interactive distributor pages or promising reliable Obscura access to DigiKey/Mouser. The existing recommendation of a separately validated original-file downloader is unchanged. No cloud/private service was accessed and no browser daemon was left running by this follow-up.
