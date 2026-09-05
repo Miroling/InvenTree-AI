@@ -12,7 +12,9 @@ The canonical plan is [Find the path to cloud InvenTree access from ChatGPT, Cod
 
 Research notes are linked from their research tickets. Decisions are recorded in issue resolution comments, with a short index in the map.
 
-Completed research:
+Completed research (earlier provider recommendations are historical; the owner now requires Obscura and excludes PinchTab):
+
+- [Obscura configuration: challenges, sessions, structured extraction and verified recovery](https://github.com/Miroling/InvenTree-AI/blob/5394ca14e50d55883c1d23745cd218d9a4f0f646/docs/research/obscura-configuration.md)
 
 - [ChatGPT and Codex connection requirements](https://github.com/Miroling/InvenTree-AI/blob/a8e093cc508c6871a922df3a7bfda7af46ada9e4/docs/research/client-compatibility.md)
 - [PoC capabilities and cloud migration gaps](https://github.com/Miroling/InvenTree-AI/blob/acd07adfcdda89f18bd40917d417840480bb0b7d/docs/research/poc-assessment.md)
@@ -34,7 +36,7 @@ GitHub distributes the source, documentation, and eventual Codex package. The MC
 
 Docker Compose and Helm for k3s are required deployment targets. InvenTree determines access by validating each user's personal API token; a separate manual allowlist is not required. All inventory requests retain that user's upstream permissions. ChatGPT, Codex, and Claude use separate MCP OAuth credentials, not the raw InvenTree token. See [the authentication design](docs/deployment/authentication.md).
 
-The OAuth broker, credential storage, first release's workflows, and runtime implementation are still being decided in the map. Current research starts from an existing local InvenTree proof of concept, including its intake workflows, API compatibility fixes, and review-before-write behavior. Obscura is being evaluated for component enrichment; it is not selected or bundled.
+The OAuth broker, credential storage, first release's workflows, and runtime implementation are still being decided in the map. Current research starts from an existing local InvenTree proof of concept, including its intake workflows, API compatibility fixes, and review-before-write behavior. The owner selected [Obscura](https://github.com/h4ckf0r0day/obscura) for component research and excludes PinchTab. The worker is not bundled yet; configuration and extraction research must follow this selection.
 
 ## Contributing to the decisions
 

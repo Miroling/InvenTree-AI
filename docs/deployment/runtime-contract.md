@@ -43,7 +43,7 @@ Maintain separate credentials for AI-to-MCP and service-to-InvenTree. Apply reso
 
 ## Browser worker boundary
 
-Obscura remains a candidate, not a bundled provider. A worker has no public control port, neither user's credential, and no direct inventory-write authority. It receives only authorized research jobs and produces attributable evidence. Specify URL/redirect/egress restrictions, resource limits and per-user job isolation before adding it.
+Obscura (https://github.com/h4ckf0r0day/obscura) is the owner-selected browser engine; PinchTab is excluded. The Obscura worker is not bundled yet. A worker has no public control port, neither user's credential, and no direct inventory-write authority. It receives only authorized research jobs and produces attributable evidence. The [Obscura configuration research](https://github.com/Miroling/InvenTree-AI/blob/5394ca14e50d55883c1d23745cd218d9a4f0f646/docs/research/obscura-configuration.md) defines the proposed render/stealth build, single-worker session, raw-versus-rendered extraction and bounded recovery profiles. Apply URL/redirect/egress restrictions, resource limits and per-user job isolation before adding it.
 
 ## Required release evidence
 
