@@ -38,6 +38,10 @@ Docker Compose and Helm for k3s are required deployment targets. InvenTree deter
 
 The OAuth broker, credential storage, first release's workflows, and runtime implementation are still being decided in the map. Current research starts from an existing local InvenTree proof of concept, including its intake workflows, API compatibility fixes, and review-before-write behavior. The owner selected [Obscura](https://github.com/h4ckf0r0day/obscura) for component research and excludes PinchTab. The [accepted extraction approach](https://github.com/Miroling/InvenTree-AI/issues/10#issuecomment-5551960090) reads original HTML first, renders JavaScript only when needed, and returns targeted component evidence with original source documents. The worker and server adapter are not implemented yet.
 
+Component research follows the [manufacturer-verification skill](.agents/skills/inventree-component-research/SKILL.md): search the official manufacturer, collect datasheets, and verify each accessible seller specification before proposing catalog values.
+
+The first [AliExpress intake prototype](https://github.com/Miroling/InvenTree-AI/tree/2bf28d2f6fa765860590a90ebaa3e859ad03f1a5/prototypes/aliexpress-intake) uses HUSB238_002DD, recorded Obscura evidence, official Hynetek documentation and synthetic inventory. Download and open its self-contained `index.html` to explore claim verification and Change Plan review. It is a throwaway demonstration on a separate branch, not a running MCP service; [owner review remains open](https://github.com/Miroling/InvenTree-AI/issues/16).
+
 ## Contributing to the decisions
 
 Read the map, then choose an open child issue with no open blockers and no assignee. Claim it before work, cite primary sources, and keep recommendations distinct from decisions made with the owner. See [the tracker guide](docs/agents/issue-tracker.md).

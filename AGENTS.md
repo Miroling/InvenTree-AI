@@ -2,7 +2,7 @@
 
 ## Project stage
 
-This project is in wayfinder planning with explicitly requested deployment scaffolding. The canonical artifact is [Find the path to cloud InvenTree access from ChatGPT, Codex, and Claude](https://github.com/Miroling/InvenTree-AI/issues/1). The owner has authorized Docker Compose and a Helm chart for k3s now; do not reinterpret planning as a reason to leave those artifacts unwritten. Runtime implementation, the OAuth broker library/storage, and workflow scope still require decisions.
+This project is in wayfinder planning with explicitly requested deployment scaffolding. The canonical artifact is [Find the path to cloud InvenTree access from ChatGPT, Codex, and Claude](https://github.com/Miroling/InvenTree-AI/issues/1). The owner has authorized Docker Compose and a Helm chart for k3s now; do not reinterpret planning as a reason to leave those artifacts unwritten. The owner also authorized a throwaway AliExpress intake prototype with synthetic inventory on a separate prototype branch, and a manufacturer-verification skill in this repository. Production runtime implementation, the OAuth broker library/storage, and workflow scope still require decisions.
 
 Ask the owner questions in Ukrainian. Write all repository documentation, issue bodies, research, and code comments in English.
 
@@ -23,6 +23,8 @@ Do not copy third-party implementation or skills before checking provenance and 
 Never connect to, inspect, query, or modify any VPS, private InvenTree instance, or deployment server unless the user gives explicit permission for that specific task. Permission from earlier tasks does not carry forward. Public documentation and the GitHub repository are available for this planning effort.
 
 ## Inventory behavior
+
+For component intake and enrichment, use [.agents/skills/inventree-component-research/SKILL.md](.agents/skills/inventree-component-research/SKILL.md). The owner requires an official manufacturer search, collected datasheets, and claim-by-claim verification of seller characteristics. Manufacturer evidence is the technical source of truth; inaccessible seller sections and commercial claims remain explicitly unverified or seller-only.
 
 Preserve the reference workflow's requirement for a reviewable Change Plan and explicit approval before inventory writes. Automated flows must not delete inventory data. Planning and code changes do not authorize production inventory operations.
 
