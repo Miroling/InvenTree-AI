@@ -1,0 +1,15 @@
+# Worksheet: replace every empty required value with a verified deployment input.
+# No published InvenTree-AI image is available yet.
+image:
+  reference: ""
+publicUrl: ""
+inventreeUrl: ""
+auth:
+  issuerUrl: ""
+  audience: ""
+existingSecret: ""
+ingress:
+  enabled: true
+  className: traefik
+  host: ""
+  tlsSecretName: ""

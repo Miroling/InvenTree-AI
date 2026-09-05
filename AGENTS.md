@@ -2,7 +2,11 @@
 
 ## Project stage
 
-This project is in wayfinder planning. The canonical artifact is [Find the path to cloud InvenTree access from ChatGPT and Codex](https://github.com/Miroling/InvenTree-AI/issues/1). Resolve decisions before implementing the integration unless the owner explicitly asks to proceed with execution.
+This project is in wayfinder planning with explicitly requested deployment scaffolding. The canonical artifact is [Find the path to cloud InvenTree access from ChatGPT, Codex, and Claude](https://github.com/Miroling/InvenTree-AI/issues/1). The owner has authorized Docker Compose and a Helm chart for k3s now; do not reinterpret planning as a reason to leave those artifacts unwritten. The runtime, identity provider and workflow scope still require decisions.
+
+Ask the owner questions in Ukrainian. Write all repository documentation, issue bodies, research, and code comments in English.
+
+Required deployment targets are Docker Compose and Helm on k3s. Public inventory access must require authenticated and authorized users from ChatGPT, Codex, and Claude. Login to an AI client is not authorization to this service. Obscura is a candidate for component research, not an approved replacement for PinchTab.
 
 Consult wayfinder, grilling, and domain-modeling for decision sessions. Consult research for evidence gathering, official OpenAI documentation for client requirements, and plugin-creator when implementing Codex packaging. Recommendations in research are not owner-approved decisions.
 

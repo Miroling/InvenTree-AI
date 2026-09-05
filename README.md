@@ -1,12 +1,14 @@
 # InvenTree-AI
 
-An open-source project for connecting InvenTree to ChatGPT in a browser and to Codex through a hosted Model Context Protocol (MCP) service.
+An open-source project for connecting InvenTree to ChatGPT in a browser, Codex, and Claude through an authenticated hosted Model Context Protocol (MCP) service.
 
-**Status: planning and research.** This repository does not yet contain a working MCP service or an installable Codex plugin. No deployment is available from this repository yet.
+**Status: planning, research, and deployment scaffolding.** Docker Compose and a Helm chart for k3s are available. The repository does not yet contain a working MCP service, runtime image, implemented OAuth integration, or installable plugin. Template validation does not establish runtime readiness.
+
+See [Docker Compose](compose.yaml), [the Helm chart](charts/inventree-ai), and [deployment instructions](docs/deployment/README.md). Deployment artifacts require an image implementing the [proposed runtime contract](docs/deployment/runtime-contract.md); no runnable image is implied by these examples.
 
 ## Follow the plan
 
-The canonical plan is [Find the path to cloud InvenTree access from ChatGPT and Codex](https://github.com/Miroling/InvenTree-AI/issues/1). Its child issues hold investigations and decisions; native GitHub dependencies show what can be worked on next.
+The canonical plan is [Find the path to cloud InvenTree access from ChatGPT, Codex, and Claude](https://github.com/Miroling/InvenTree-AI/issues/1). Its child issues hold investigations and decisions; native GitHub dependencies show what can be worked on next.
 
 Research notes are linked from their research tickets. Decisions are recorded in issue resolution comments, with a short index in the map.
 
@@ -15,18 +17,20 @@ Completed research:
 - [ChatGPT and Codex connection requirements](https://github.com/Miroling/InvenTree-AI/blob/a8e093cc508c6871a922df3a7bfda7af46ada9e4/docs/research/client-compatibility.md)
 - [PoC capabilities and cloud migration gaps](https://github.com/Miroling/InvenTree-AI/blob/acd07adfcdda89f18bd40917d417840480bb0b7d/docs/research/poc-assessment.md)
 - [Hosting options and credential boundaries](https://github.com/Miroling/InvenTree-AI/blob/d89363a6c82ef67b3ae145ccbbc7260211fff81d/docs/research/hosting-options.md)
+- [Authenticated access across ChatGPT, Codex, and Claude](https://github.com/Miroling/InvenTree-AI/blob/60c7a2d309f325c6392718fbcef8e7e3ffc6007e/docs/research/authenticated-clients.md)
+- [Provisional Obscura evaluation](https://github.com/Miroling/InvenTree-AI/blob/f7b27dfbba2d8dc5234b4361409094745404b387/docs/research/obscura-evaluation.md)
 
 ## Intended connection
 
 ```text
 ChatGPT in a browser ─┐
-                     ├── HTTPS MCP service ── InvenTree API
-Codex ───────────────┘
+Codex ────────────────┼── HTTPS + OAuth ── MCP service ── InvenTree API
+Claude ───────────────┘
 ```
 
 GitHub distributes the source, documentation, and eventual Codex package. The MCP service needs a separate runtime that can reach the selected InvenTree instance.
 
-The first release's workflows, hosting, login, and packaging are being decided in the map. Current research starts from an existing local InvenTree proof of concept, including its intake workflows, API compatibility fixes, and review-before-write behavior.
+Docker Compose and Helm for k3s are required deployment targets. The first release's workflows, identity model, and runtime implementation are still being decided in the map. Current research starts from an existing local InvenTree proof of concept, including its intake workflows, API compatibility fixes, and review-before-write behavior. Obscura is being evaluated for component enrichment; it is not selected or bundled.
 
 ## Contributing to the decisions
 

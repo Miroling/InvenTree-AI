@@ -1,0 +1,47 @@
+# Required values have no working defaults: the MCP runtime is not implemented yet.
+image:
+  reference: ""
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+
+# Single replica until the runtime's session and durable-state contract is decided.
+replicaCount: 1
+publicUrl: ""
+inventreeUrl: ""
+auth:
+  issuerUrl: ""
+  audience: ""
+
+# Pre-existing Secret; keys: inventree-token and authorization-policy.json.
+# No secret contents belong in Helm values or rendered release history.
+existingSecret: ""
+
+ingress:
+  enabled: false
+  className: traefik
+  host: ""
+  tlsSecretName: ""
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+
+networkPolicy:
+  enabled: true
+  # Both selectors must match. Adjust for the actual ingress-controller install.
+  ingressNamespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: kube-system
+  ingressPodSelector:
+    matchLabels:
+      app.kubernetes.io/name: traefik
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: "1"
+    memory: 512Mi
+nodeSelector: {}
+tolerations: []
+affinity: {}
