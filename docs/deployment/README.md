@@ -19,7 +19,7 @@ Only the front door is public. OAuth discovery is public and inventory MCP calls
 
 ## Docker Compose
 
-1. Copy `deploy/compose/.env.example` to an operator-owned file outside source control and fill in the verified MCP image, pinned official Caddy image, MCP domain, OAuth issuer/audience, upstream URL, and local secret-file paths. Use absolute secret-file paths. The policy format depends on the selected identity model.
+1. Copy `deploy/compose/.env.example` to an operator-owned file outside source control and fill in the verified MCP image, pinned official Caddy image, MCP domain, OAuth issuer/audience, upstream URL, and local secret-file paths. Use absolute secret-file paths. The policy must admit only explicitly allowed users; its format depends on the future provider integration.
 2. Make mounted secret files readable by the container's UID/GID `10001` without broadening access to unrelated users. Compose file-backed secrets use bind mounts; do not assume a `uid` or `mode` declaration will fix host permissions. Keep the InvenTree token out of environment worksheets and command arguments. [Compose secret behavior](https://docs.docker.com/reference/compose-file/services/#secrets).
 3. Validate without contacting Docker Engine:
 

@@ -8,6 +8,8 @@ Ask the owner questions in Ukrainian. Write all repository documentation, issue 
 
 Required deployment targets are Docker Compose and Helm on k3s. Public inventory access must require authenticated and authorized users from ChatGPT, Codex, and Claude. Login to an AI client is not authorization to this service. Obscura is a candidate for component research, not an approved replacement for PinchTab.
 
+The owner selected access for explicitly allowed users only. Deny users who are not on the owner-controlled allowed-user list even if authentication succeeds. The identity provider and its hosting location remain open choices; do not re-open the admission-model choice without new owner instructions.
+
 Consult wayfinder, grilling, and domain-modeling for decision sessions. Consult research for evidence gathering, official OpenAI documentation for client requirements, and plugin-creator when implementing Codex packaging. Recommendations in research are not owner-approved decisions.
 
 ## Reference material and public content

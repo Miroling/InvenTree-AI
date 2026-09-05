@@ -4,6 +4,9 @@ This context describes inventory records and the review process for changes prop
 
 ## Language
 
+**Allowed user**:
+A person explicitly approved by the inventory owner to access the integration after signing in. Signing in alone does not make someone an allowed user.
+
 **Part**:
 A catalog definition of an item that may be held in inventory.
 _Avoid_: Using “stock item” for the catalog definition.

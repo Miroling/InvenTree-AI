@@ -30,7 +30,7 @@ Claude ───────────────┘
 
 GitHub distributes the source, documentation, and eventual Codex package. The MCP service needs a separate runtime that can reach the selected InvenTree instance.
 
-Docker Compose and Helm for k3s are required deployment targets. The first release's workflows, identity model, and runtime implementation are still being decided in the map. Current research starts from an existing local InvenTree proof of concept, including its intake workflows, API compatibility fixes, and review-before-write behavior. Obscura is being evaluated for component enrichment; it is not selected or bundled.
+Docker Compose and Helm for k3s are required deployment targets. Access is restricted to explicitly allowed users. The identity provider, first release's workflows, and runtime implementation are still being decided in the map. Current research starts from an existing local InvenTree proof of concept, including its intake workflows, API compatibility fixes, and review-before-write behavior. Obscura is being evaluated for component enrichment; it is not selected or bundled.
 
 ## Contributing to the decisions
 

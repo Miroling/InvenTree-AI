@@ -1,6 +1,6 @@
 # Proposed MCP runtime contract
 
-Status: an interface for the deployment scaffold, not an implemented server. Docker Compose and Helm cannot enforce application authentication merely by setting environment variables. No current image has been verified against this contract. The authentication provider, authorized-user model, and inventory operation set remain open decisions.
+Status: an interface for the deployment scaffold, not an implemented server. Docker Compose and Helm cannot enforce application authentication merely by setting environment variables. No current image has been verified against this contract. The owner selected access for explicitly allowed users only; the authentication provider and inventory operation set remain open decisions.
 
 The owner requested Docker Compose, Helm deployment on k3s, and authenticated access from ChatGPT, Codex, and Claude. Preparing these deployment artifacts is explicitly in scope before the rest of the implementation is selected.
 
@@ -15,7 +15,7 @@ The eventual image must support Linux architectures published in its manifest, r
 | `MCP_AUTH_REQUIRED` | Always `true` in these deployment artifacts. The application must reject missing, invalid, or disabled auth configuration at startup. |
 | `MCP_AUTH_ISSUER_URL` | Trusted HTTPS authorization-server issuer; never obtained from an untrusted token. |
 | `MCP_AUTH_AUDIENCE` | Expected audience/resource for this MCP service. Validation must follow the actual provider's token format. |
-| `MCP_AUTH_POLICY_FILE` | Read-only file containing service authorization rules. Its format will be chosen with the identity model; missing, invalid, or unmatched policy must deny access. |
+| `MCP_AUTH_POLICY_FILE` | Read-only file containing the owner-controlled allowed-user policy. Its format and verified principal binding will be specified with the provider integration; missing, invalid, or unmatched policy must deny access. |
 | `INVENTREE_URL` | Operator-configured upstream instance URL. HTTP is only for a deliberately trusted private network; use HTTPS across untrusted networks. Never accept a caller-supplied arbitrary instance URL in a single-instance deployment. |
 | `INVENTREE_TOKEN_FILE` | Separate read-only upstream credential file. Never forward the MCP bearer token to InvenTree. |
 
@@ -35,7 +35,7 @@ The OAuth provider serves its own discovery, login, authorization, token, and re
 
 Signing in to ChatGPT, Codex, or Claude does not confer access to someone's inventory. A client must obtain an OAuth access token for this MCP service after the authorized person signs in and consents. The server must validate signature or authenticated introspection, issuer, audience/resource, validity times, required scopes, and the selected allowed-user/organization/instance policy. Client names, `User-Agent`, CORS, and IP lists do not replace these checks.
 
-The identity decision will choose allowlisted people, organizational SSO, or another explicitly agreed mapping. Until then, the authorization policy has no permissive example. Client registration through CIMD/DCR does not authorize a user; accepting a registration must not grant inventory access. Read and write permissions must be distinguishable, approved changes must remain tied to their specific plan, and automated deletion remains prohibited.
+The owner selected **explicitly allowed users only**. A user must authenticate successfully and belong to the owner-controlled allowed-user list; either condition alone is insufficient. Unlisted users are denied by default. The provider, list administration, verified principal binding, and revocation behavior remain to be specified. No actual user list or permissive example is published. Client registration through CIMD/DCR does not authorize a user; accepting a registration must not grant inventory access. Read and write permissions must be distinguishable, approved changes must remain tied to their specific plan, and automated deletion remains prohibited.
 
 See [authenticated client research](https://github.com/Miroling/InvenTree-AI/blob/60c7a2d309f325c6392718fbcef8e7e3ffc6007e/docs/research/authenticated-clients.md), [OpenAI authentication](https://developers.openai.com/plugins/build/auth), and [Claude connector authentication](https://claude.com/docs/connectors/building/authentication). Exact client callbacks and provider registration support must be verified when configuring the chosen provider.
 
