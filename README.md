@@ -36,7 +36,7 @@ GitHub distributes the source, documentation, and eventual Codex package. The MC
 
 Docker Compose and Helm for k3s are required deployment targets. InvenTree determines access by validating each user's personal API token; a separate manual allowlist is not required. All inventory requests retain that user's upstream permissions. ChatGPT, Codex, and Claude use separate MCP OAuth credentials, not the raw InvenTree token. See [the authentication design](docs/deployment/authentication.md).
 
-The OAuth broker, credential storage, first release's workflows, and runtime implementation are still being decided in the map. Current research starts from an existing local InvenTree proof of concept, including its intake workflows, API compatibility fixes, and review-before-write behavior. The owner selected [Obscura](https://github.com/h4ckf0r0day/obscura) for component research and excludes PinchTab. The worker is not bundled yet; configuration and extraction research must follow this selection.
+The OAuth broker, credential storage, first release's workflows, and runtime implementation are still being decided in the map. Current research starts from an existing local InvenTree proof of concept, including its intake workflows, API compatibility fixes, and review-before-write behavior. The owner selected [Obscura](https://github.com/h4ckf0r0day/obscura) for component research and excludes PinchTab. The [accepted extraction approach](https://github.com/Miroling/InvenTree-AI/issues/10#issuecomment-5551960090) reads original HTML first, renders JavaScript only when needed, and returns targeted component evidence with original source documents. The worker and server adapter are not implemented yet.
 
 ## Contributing to the decisions
 
